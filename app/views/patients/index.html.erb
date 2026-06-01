@@ -1,0 +1,57 @@
+<% content_for :title, "Patients — Dental Follow-Up Bot" %>
+
+<% if notice %>
+  <p class="notice"><%= notice %></p>
+<% end %>
+
+<h1>Dental Follow-Up Bot</h1>
+<p style="color:#6b7280; margin-bottom:1.2rem;">Add patients, trigger follow-up calls, and see outcomes below.</p>
+
+<div class="actions">
+  <%= link_to "＋ Add Patient", new_patient_path, class: "btn btn-primary" %>
+</div>
+
+<table>
+  <thead>
+    <tr>
+      <th>Patient</th>
+      <th>Procedure</th>
+      <th>Phone</th>
+      <th>Last Call</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @patients.each do |patient| %>
+      <% call = patient.call_records.max_by(&:created_at) %>
+      <tr>
+        <td><%= link_to patient.name, patient %></td>
+        <td><%= patient.procedure_name %></td>
+        <td><%= patient.phone_number %></td>
+        <td>
+          <% if call %>
+            <% badge_class = call.problem_reported? ? "badge-warn" : (call.completed? ? "badge-ok" : (call.status == "failed" ? "badge-fail" : "badge-pending")) %>
+            <span class="badge <%= badge_class %>">
+              <% if call.problem_reported? %>⚠ Problem reported<% else %><%= call.status.humanize %><% end %>
+            </span>
+          <% else %>
+            <span style="color:#9ca3af">No calls yet</span>
+          <% end %>
+        </td>
+        <td>
+          <%= button_to "📞 Call", call_patient_path(patient),
+              method: :post,
+              class: "btn btn-call",
+              data: { turbo_confirm: "Call #{patient.name} now?" } %>
+        </td>
+      </tr>
+    <% end %>
+    <% if @patients.empty? %>
+      <tr>
+        <td colspan="5" style="text-align:center; color:#9ca3af; padding:2rem">
+          No patients yet. <%= link_to "Add one", new_patient_path %>.
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

@@ -1,0 +1,41 @@
+<% content_for :title, "Add Patient" %>
+
+<div class="form-container">
+  <h1>Add New Patient</h1>
+
+  <%= form_with model: @patient do |f| %>
+    <% if @patient.errors.any? %>
+      <div class="errors">
+        <% @patient.errors.full_messages.each do |msg| %>
+          <p style="margin:0"><%= msg %></p>
+        <% end %>
+      </div>
+    <% end %>
+
+    <div class="field">
+      <%= f.label :name, "Patient Name" %>
+      <%= f.text_field :name, placeholder: "Jane Smith" %>
+    </div>
+
+    <div class="field">
+      <%= f.label :phone_number, "Phone Number" %>
+      <%= f.text_field :phone_number, placeholder: "+12125551234" %>
+      <p class="hint">Must be in E.164 format — a plus sign followed by the country code and number.</p>
+    </div>
+
+    <div class="field">
+      <%= f.label :procedure_name, "Procedure Name" %>
+      <%= f.text_field :procedure_name, placeholder: "Root Canal" %>
+    </div>
+
+    <div class="field">
+      <%= f.label :procedure_notes, "Aftercare Instructions" %>
+      <%= f.text_area :procedure_notes,
+          placeholder: "Avoid hard foods for 24 hours. Take ibuprofen as needed for discomfort..." %>
+      <p class="hint">The bot will read this aloud to the patient during the call.</p>
+    </div>
+
+    <%= f.submit "Add Patient", class: "btn btn-primary" %>
+    <%= link_to "Cancel", patients_path, style: "margin-left: 1rem" %>
+  <% end %>
+</div>

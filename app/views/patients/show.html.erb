@@ -1,0 +1,86 @@
+<% content_for :title, @patient.name %>
+
+<% if notice %>
+  <p class="notice"><%= notice %></p>
+<% end %>
+
+<h1><%= @patient.name %></h1>
+<p class="patient-meta">
+  <%= @patient.procedure_name %> &nbsp;·&nbsp;
+  <%= @patient.phone_number %> &nbsp;·&nbsp;
+  Added <%= @patient.created_at.strftime("%b %d, %Y") %>
+</p>
+
+<% if @patient.procedure_notes.present? %>
+  <details style="margin-bottom:1.5rem">
+    <summary>View aftercare instructions</summary>
+    <p><%= @patient.procedure_notes %></p>
+  </details>
+<% end %>
+
+<div class="patient-actions">
+  <%= button_to "📞 Call Patient", call_patient_path(@patient),
+      method: :post,
+      class: "btn btn-call",
+      data: { turbo_confirm: "Initiate follow-up call for #{@patient.name}?" } %>
+  <%= link_to "← All Patients", patients_path, class: "btn btn-back" %>
+</div>
+
+<h2>Call History</h2>
+
+<% if @call_records.empty? %>
+  <p style="color:#9ca3af">No calls yet. Hit the button above to start one.</p>
+<% else %>
+  <% @call_records.each do |record| %>
+    <div class="call-card">
+      <div class="call-card-header">
+        <div>
+          <%
+            badge_class = if record.problem_reported?
+              "badge-warn"
+            elsif record.status == "failed"
+              "badge-fail"
+            elsif record.completed?
+              "badge-ok"
+            else
+              "badge-pending"
+            end
+          %>
+          <span class="badge <%= badge_class %> <%= "in-progress" if record.in_progress? %>">
+            <% if record.problem_reported? %>⚠ Problem reported
+            elsif record.status == "failed" %>✗ Failed
+            elsif record.in_progress? %>⟳ In progress…
+            elsif record.completed? %>✓ Completed
+            <% else %><%= record.status.humanize %><% end %>
+          </span>
+        </div>
+        <span class="call-card-date">
+          <%= record.created_at.strftime("%b %d, %Y · %I:%M %p") %>
+        </span>
+      </div>
+
+      <% if record.problem_reported? %>
+        <div class="problem-box">
+          <strong>⚠ Problem reported</strong>
+          <p style="margin:0.3rem 0 0"><%= record.problem_description %></p>
+        </div>
+      <% end %>
+
+      <% if record.summary.present? %>
+        <p class="call-card-summary"><%= record.summary %></p>
+      <% end %>
+
+      <% if record.transcript.present? %>
+        <details>
+          <summary>View raw transcript</summary>
+          <p><%= record.transcript %></p>
+        </details>
+      <% end %>
+
+      <% if record.in_progress? %>
+        <%# Auto-refresh while a call is in progress so students see updates without reloading %>
+        <meta http-equiv="refresh" content="5">
+      <% end %>
+    </div>
+  <% end %>
+<% end %>
