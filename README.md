@@ -157,13 +157,6 @@ Twilio communicates with your app by making HTTP requests at specific moments du
 **Why plain routes instead of `resources`?**
 Twilio's callbacks don't follow REST conventions — there's no concept of creating or updating a resource. Plain `post`/`get` lines make the URL-to-action mapping obvious at a glance.
 
-Verify the routes loaded correctly:
-
-```bash
-bin/rails routes | grep -E "patients|twilio"
-```
-
-You should see `call_patient`, `twilio_twiml`, `twilio_tts`, `twilio_recording`, and `twilio_status`.
 
 ---
 
