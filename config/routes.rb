@@ -1,14 +1,28 @@
 Rails.application.routes.draw do
-  # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
+  root "patients#index"
 
-  # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
-  # Can be used by load balancers and uptime monitors to verify that the app is live.
+  # Patient management + triggering calls
+  resources :patients, only: [ :index, :show, :new, :create ] do
+    member do
+      post :call  # POST /patients/:id/call — queues InitiateCallJob
+    end
+  end
+
+  # ── Twilio webhook endpoints ───────────────────────────────────────────────
+  # These are called by Twilio's servers, not by a browser.
+  # They must be publicly accessible (use ngrok in development).
+
+  # Twilio calls this when patient picks up → we return TwiML instructions
+  post "/twilio/twiml",     to: "twilio#twiml",     as: :twilio_twiml
+
+  # We serve Deepgram TTS audio from here — Twilio's <Play> fetches it
+  get  "/twilio/tts/:id",   to: "twilio#tts",        as: :twilio_tts
+
+  # Twilio calls this when the patient finishes recording their response
+  post "/twilio/recording", to: "twilio#recording",  as: :twilio_recording
+
+  # Twilio calls this when call status changes (ringing, failed, etc.)
+  post "/twilio/status",    to: "twilio#status",     as: :twilio_status
+
   get "up" => "rails/health#show", as: :rails_health_check
-
-  # Render dynamic PWA files from app/views/pwa/* (remember to link manifest in application.html.erb)
-  # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
-  # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
-
-  # Defines the root path route ("/")
-  # root "posts#index"
 end

@@ -22,6 +22,15 @@ class PatientsController < ApplicationController
     end
   end
 
+  # POST /patients/:id/call
+  # Queues an outbound call for this patient.
+  # Returns immediately — the actual Twilio API call happens in the background.
+  def call
+    patient = Patient.find(params[:id])
+    InitiateCallJob.perform_later(patient.id)
+    redirect_to patient, notice: "Call queued for #{patient.name}. Check back in a minute."
+  end
+
   private
 
   def patient_params
