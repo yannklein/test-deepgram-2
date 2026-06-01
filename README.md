@@ -85,26 +85,6 @@ DEEPGRAM_API_KEY=your_deepgram_api_key
 BASE_URL=https://abc123.ngrok.io
 ```
 
-To load these automatically, add the following to `config/application.rb`, just inside the `class Application` block:
-
-```ruby
-# Load .env in development so we don't have to export variables manually
-config.before_configuration do
-  if Rails.env.development?
-    env_file = Rails.root.join(".env")
-    if env_file.exist?
-      env_file.each_line do |line|
-        next if line.strip.empty? || line.start_with?("#")
-        key, value = line.chomp.split("=", 2)
-        ENV[key] ||= value
-      end
-    end
-  end
-end
-```
-
-> If you prefer, you can also export the variables manually before starting the server instead.
-
 ---
 
 ## Step 1 — Install the Twilio gem
