@@ -175,14 +175,6 @@ Here is what each Twilio route is for:
 
 We use plain `post`/`get` lines instead of `resources` because these are webhooks, not a REST resource.
 
-Verify it worked:
-
-```bash
-bin/rails routes | grep -E "call|twilio"
-```
-
-You should see `call_patient`, `twilio_twiml`, `twilio_tts`, `twilio_recording`, and `twilio_status`.
-
 ---
 
 ## Step 3 — Add `call` to `PatientsController`
@@ -628,12 +620,12 @@ You need three terminal tabs open simultaneously.
 
 **Tab 1 — Rails server:**
 ```bash
-bin/rails server
+rails server
 ```
 
 **Tab 2 — SolidQueue (background jobs):**
 ```bash
-bin/jobs
+jobs
 ```
 
 Without this, `InitiateCallJob` and `TranscribeRecordingJob` will be queued but never run.
