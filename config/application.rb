@@ -8,6 +8,21 @@ Bundler.require(*Rails.groups)
 
 module TestDeepgram2
   class Application < Rails::Application
+    # Load .env in development so we don't have to export variables manually.
+    # Must run before any initializer that reads ENV.
+    config.before_configuration do
+      if Rails.env.development?
+        env_file = Rails.root.join(".env")
+        if env_file.exist?
+          env_file.each_line do |line|
+            next if line.strip.empty? || line.start_with?("#")
+            key, value = line.chomp.split("=", 2)
+            ENV[key] ||= value
+          end
+        end
+      end
+    end
+
     # Initialize configuration defaults for originally generated Rails version.
     config.load_defaults 8.1
 

@@ -22,15 +22,16 @@ class InitiateCallJob < ApplicationJob
     call_record = patient.call_records.create!(status: "initiated")
 
     client = Twilio::REST::Client.new(
-      ENV.fetch("TWILIO_ACCOUNT_SID"),
-      ENV.fetch("TWILIO_AUTH_TOKEN")
+      ENV["TWILIO_ACCOUNT_SID"],
+      ENV["TWILIO_AUTH_TOKEN"]
     )
 
-    base_url = ENV.fetch("BASE_URL")  # e.g. https://abc123.ngrok.io
+    base_url = ENV["BASE_URL"]  # e.g. https://abc123.ngrok.io
+    p base_url
 
     call = client.calls.create(
       to:   patient.phone_number,
-      from: ENV.fetch("TWILIO_PHONE_NUMBER"),
+      from: ENV["TWILIO_PHONE_NUMBER"],
 
       # When the patient picks up, Twilio fetches this URL and follows the
       # TwiML instructions we return (play audio, record response, etc.)
