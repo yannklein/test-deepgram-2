@@ -83,6 +83,17 @@ ngrok http 3000
 
 Copy the `https://` URL it gives you (e.g. `https://abc123.ngrok.io`). You'll need it below.
 
+In the file `config/environments/development.rb`:
+
+```
+require "active_support/core_ext/integer/time"
+
+Rails.application.configure do
+  [...]
+  config.hosts << /.*\.ngrok-free\.app/
+end
+```
+
 ### Environment variables
 
 Create `.env` at the root of your project (never commit this file):
